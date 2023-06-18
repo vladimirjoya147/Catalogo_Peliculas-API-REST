@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  plataforma_peliculas_db:
+    container_name: plataformaPeliculasDb
+    build: ./db
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - datos_db:/var/lib/mysql
+
+  plataforma_peliculas_backend:
+    container_name: plataformaPeliculasBackend
+    build: ./backend
+    ports:
+      - "8080:8080"
+    links:
+      - plataforma_peliculas_db
+    depends_on:
+      plataforma_peliculas_db:
+        condition: service_healthy
+
+volumes:
+  datos_db:
